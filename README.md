@@ -10,7 +10,6 @@ embedding them into a ChromaDB collection, querying for relevant information, an
 - **Clear All**: Delete all stored documents from the database.
 
 ## Prerequisites
-- Docker
 - Python 3.11
 - A `.env` file with the following variables:
   ```env
@@ -28,6 +27,9 @@ ANTHROPIC_API_KEY="your_anthropic_api_key_here"
 TOKENIZERS_PARALLELISM=false
 CHROMA_TELEMETRY_ENABLED=false
 ```
+### 2. Setup
+- run command pip install -r requirements.txt (venv recommended)
+- run command python app.py
 
 ### 3. API Endpoints
 #### Upload a File
