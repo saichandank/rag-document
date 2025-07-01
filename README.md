@@ -45,6 +45,6 @@ CHROMA_TELEMETRY_ENABLED=false
 - **Method**: `DELETE`
 
 
-- Replace `your_anthropic_api_key_here` with your actual API key.
+
 
 
