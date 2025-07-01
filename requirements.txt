@@ -1,0 +1,6 @@
+flask
+chromadb
+python-dotenv
+sentence-transformers
+anthropic
+PyPDF2
