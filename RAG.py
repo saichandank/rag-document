@@ -2,8 +2,10 @@ import chromadb
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 import os
-import anthropic
+# import anthropic
+import requests
 from PyPDF2 import PdfReader
+
 
 
 load_dotenv()
@@ -11,7 +13,7 @@ load_dotenv()
 class RAG:
     def __init__(self, chroma_path="./Document-Agent/chroma_db"):
         
-        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        self.api_key = os.getenv("LLM_API_KEY")
         self.count = 1
         try:
             if chroma_path:
@@ -76,36 +78,83 @@ class RAG:
 
 
 
+    # def generate_response(self, query):
+
+    #     documents, document_ids = self.retrieve_documents(query)
+
+    #     flat_documents = [doc for sublist in documents for doc in (sublist if isinstance(sublist, list) else [sublist])]
+    #     context = "\n\n".join(flat_documents)
+
+        
+    #     prompt = f"""   Please answer the user's question based on the following context.
+    #                     If the context does not contain the answer, say so.
+
+    #                     Context:
+    #                     {context}
+
+    #                     User Question: {query}
+
+    #                     Answer:"""
+        
+    #     print(prompt)
+    #     client = anthropic.Anthropic(api_key=self.api_key)
+    #     try:
+    #         response = client.messages.create(
+    #             model= "claude-3-5-sonnet-20241022",
+    #             max_tokens=250,
+    #             messages=[
+    #                 {"role": "user", "content": prompt}
+    #             ]
+    #         )
+    #         final_answer = response.content[0].text
+    #         return final_answer
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+    #         return "Sorry, I couldn't process your request."
+
     def generate_response(self, query):
-
         documents, document_ids = self.retrieve_documents(query)
-
         flat_documents = [doc for sublist in documents for doc in (sublist if isinstance(sublist, list) else [sublist])]
         context = "\n\n".join(flat_documents)
+        max_context_length = 80000
+        if len(context) > max_context_length:
+            context = context[:max_context_length]
 
-        
-        prompt = f"""   Please answer the user's question based on the following context.
-                        If the context does not contain the answer, say so.
+        prompt = f"""Please answer the user's question based on the following context.
+                    If the context does not contain the answer, say so.
 
-                        Context:
-                        {context}
+                    Context:
+                    {context}
 
-                        User Question: {query}
+                    User Question: {query}
 
-                        Answer:"""
-        
+                    Answer:"""
+
         print(prompt)
-        client = anthropic.Anthropic(api_key=self.api_key)
         try:
-            response = client.messages.create(
-                model= "claude-3-5-sonnet-20241022",
-                max_tokens=250,
-                messages=[
+            api_url = "https://openrouter.ai/api/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": "mistralai/mistral-small-3.2-24b-instruct:free",
+                "messages": [
                     {"role": "user", "content": prompt}
-                ]
-            )
-            final_answer = response.content[0].text
-            return final_answer
+                ],
+                "max_tokens": 250
+            }
+            response = requests.post(api_url, headers=headers, json=data)
+            response.raise_for_status()
+            result = response.json()
+            # Extract only the answer part from the response
+            answer = result["choices"][0]["message"]["content"]
+            return answer
+        #     response = requests.post(api_url, headers=headers, json=data)
+        #     response.raise_for_status()
+        #     result = response.json()
+        #     final_answer = result["choices"][0]["message"]["content"]
+        #     return final_answer
         except Exception as e:
             print(f"An error occurred: {e}")
             return "Sorry, I couldn't process your request."
