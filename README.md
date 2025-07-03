@@ -11,21 +11,15 @@ embedding them into a ChromaDB collection, querying for relevant information, an
 
 ## Prerequisites
 - Python 3.11
-- A `.env` file with the following variables:
-  ```env
-  ANTHROPIC_API_KEY="your_anthropic_api_key_here"
-  TOKENIZERS_PARALLELISM=false
-  CHROMA_TELEMETRY_ENABLED=false
-  ```
 
 ## How to Run
 
 ### 1. Create a `.env` File
 Create a `.env` file in the project root with the following content:
 ```env
-ANTHROPIC_API_KEY="your_anthropic_api_key_here"
-TOKENIZERS_PARALLELISM=false
+LLM_API_KEY= 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
 CHROMA_TELEMETRY_ENABLED=false
+TOKENIZERS_PARALLELISM = false
 ```
 ### 2. Setup
 - run command pip install -r requirements.txt (venv recommended)
